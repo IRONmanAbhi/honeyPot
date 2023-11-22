@@ -11,101 +11,130 @@ HOSTKEY = paramiko.RSAKey.from_private_key_file(
 file_system = {
     "/": {
         "bin": {
-            "files": ["ls", "cp", "rm", "mv"],
-            "directories": [],
+            "files": {
+                "ls",
+                "cp",
+                "rm",
+                "mv",
+                "apt," "apt-add-repository",
+                "apt-cache",
+                "apt-config",
+                "apt-get",
+                "apt-key",
+                "aria_dump_log",
+                "base32",
+                "base58",
+                "base64",
+                "basename",
+                "basenc",
+                "bash",
+                "bdftruncate",
+                "besside-ng-crawler",
+            },
+            "directories": {},
         },
         "home": {
             "ironmanabhi": {
-                "files": ["file1.txt", "file2.txt", "file3.txt"],
+                "files": {"vpn.txt", "python101.pdf"},
                 "directories": {
-                    "Desktop",
-                    "Documents",
-                    "Downloads",
-                    "Music",
-                    "Pictures",
-                    "Public",
-                    "Templates",
-                    "Videos",
+                    "Desktop": {},
+                    "Documents": {},
+                    "Downloads": {},
+                    "Music": {},
+                    "Pictures": {},
+                    "Public": {},
+                    "Templates": {},
+                    "Videos": {},
                 },
             },
         },
         "lib32": {
-            "files": ["lib32_1.so", "lib32_2.so"],
-            "directories": [],
+            "files": {
+                "lib32_1.so",
+                "lib32_2.so",
+                "lib32_3.so",
+                "lib32_4.so",
+                "lib32_5.so",
+                "lib32_6.so",
+                "lib32_7.so",
+                "lib32_8.so",
+                "lib32_9.so",
+            },
+            "directories": {},
         },
         "media": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {"ironmanabhi"},
         },
         "root": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "srv": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "var": {
             "log": {
-                "files": ["app.log", "system.log"],
-                "directories": [],
+                "files": {"app.log", "system.log"},
+                "directories": {},
             },
             "tmp": {
-                "files": [],
-                "directories": [],
+                "files": {},
+                "directories": {},
             },
         },
         "boot": {
-            "files": ["vmlinuz"],
-            "directories": [],
+            "files": {"vmlinuz"},
+            "directories": {},
         },
         "lib64": {
-            "files": ["lib64_1.so", "lib64_2.so"],
-            "directories": [],
+            "files": {"lib64_1.so", "lib64_2.so"},
+            "directories": {},
         },
         "mnt": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "run": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "sys": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "vmlinuz": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "dev": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "opt": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "sbin": {
-            "files": ["service1", "service2"],
-            "directories": [],
+            "files": {"service1", "service2"},
+            "directories": {},
         },
         "tmp": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
         "etc": {
-            "files": ["config1", "config2"],
-            "directories": [],
+            "files": {"config1", "config2"},
+            "directories": {},
         },
         "lib": {
-            "files": ["lib1.so", "lib2.so", "lib3.so"],
-            "directories": [],
+            "files": {"lib1.so", "lib2.so", "lib3.so"},
+            "directories": {},
         },
         "usr": {
-            "files": [],
-            "directories": [],
+            "files": {},
+            "directories": {},
         },
     },
 }
@@ -142,11 +171,11 @@ if __name__ == "__main__":
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(("0.0.0.0", ssh_port))
     sock.listen(100)
-    print("[+] Listening for connection ...")
+    print("{+} Listening for connection ...")
     while True:
         client, addr = sock.accept()
 
-        print("[+] Got a connection!", addr)
+        print("{+} Got a connection!", addr)
         Session = paramiko.Transport(client)
         Session.add_server_key(HOSTKEY)
         Session.set_gss_host(socket.getfqdn(""))
@@ -158,7 +187,7 @@ if __name__ == "__main__":
         if chan is None:
             print("*** No channel.")
             sys.exit(1)
-        print("[+] Authenticated!")
+        print("{+} Authenticated!")
         chan.send("Welcome to SSH\n".encode())
         chan.send("To exit, simply type 'exit'.\n")
         chan.send("Enter 'help' to see the list of commands\n".encode())
@@ -173,9 +202,26 @@ if __name__ == "__main__":
                 or cmd.lower() == "quit"
                 or cmd.lower() == "logout"
             ):
-                chan.send("Goodbye!\n")
+                chan.send("Goodbye!\n".encode())
                 chan.close()
                 break
             else:
-                # command definitions
-                chan.send()
+                if cmd == "ls":
+                    response = ""
+                    for i in file_system["/"]["home"]["ironmanabhi"]["directories"]:
+                        response += i + "\n"
+                    response += "\n".join(
+                        file_system["/"]["home"]["ironmanabhi"]["files"] + [""]
+                    )
+                    chan.send(response.encode())
+                elif cmd[:2] == "cd":
+                    fileName = cmd[3:]
+                    if (
+                        fileName
+                        in file_system["/"]["home"]["ironmanabhi"]["directories"]
+                    ):
+                        chan.send("Directory changed to " + fileName + "\n")
+                    else:
+                        chan.send("No such directory\n")
+                elif cmd == "rest_commands":
+                    pass
